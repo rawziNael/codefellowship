@@ -1,13 +1,22 @@
 package com.example.codefellowship.web;
 
 import com.example.codefellowship.domain.ApplicationUser;
+import com.example.codefellowship.domain.Post;
 import com.example.codefellowship.infrastructure.ApplicationUserRepository;
+import com.example.codefellowship.infrastructure.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+
+import java.security.Principal;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 public class WebController{
@@ -17,6 +26,10 @@ public class WebController{
 
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
+
+    //lab17
+    @Autowired
+    private PostRepository postRepository;
 
 
     @GetMapping("/")
@@ -69,5 +82,38 @@ public class WebController{
     @PostMapping("/logout")
     public RedirectView logOutUserWithSecret() {
         return new RedirectView("/login");
+    }
+
+    //**************************************************Lab17**********************************************
+
+    @PostMapping("/post")
+    public RedirectView post(@RequestParam String body, Principal p, Model m) {
+
+        Format formatDate = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        String createdAt = formatDate.format(new Date());
+
+        Post newPost = new Post( body , createdAt);
+        newPost.applicationUser = (ApplicationUser)((UsernamePasswordAuthenticationToken) p).getPrincipal();
+        postRepository.save(newPost);
+        return new RedirectView("/myprofile");
+    }
+
+    @GetMapping("/myprofile")
+    public String showMyProfile(Principal p, Model m) {
+        ApplicationUser user = (ApplicationUser)((UsernamePasswordAuthenticationToken) p).getPrincipal();
+
+        List<Post> posts = applicationUserRepository.findById(user.id).get().posts;
+        if (posts.size() > 0) {m.addAttribute("posts", posts);}
+        m.addAttribute("user", user);
+        return "profile";
+    }
+
+    @GetMapping("/user/{userId}")
+    public String viewProfile(@PathVariable long userId, Principal p, Model m) {
+        //getUsername(p, m);
+        List<Post> posts = applicationUserRepository.findById(userId).get().posts;
+        if (posts.size() > 0) {m.addAttribute("posts", posts);}
+        m.addAttribute("user", applicationUserRepository.findById(userId).get());
+        return "profile";
     }
 }

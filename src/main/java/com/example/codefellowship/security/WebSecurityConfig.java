@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
 
 @Configuration
 @EnableWebSecurity
@@ -23,10 +24,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         }
 
 
-    @Override
-    protected void configure(final AuthenticationManagerBuilder authManagerBuilder) throws Exception {
-        authManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-    }
+        @Override
+        protected void configure(final AuthenticationManagerBuilder authManagerBuilder) throws Exception {
+            authManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        }
 
         @Override
         protected void configure(final HttpSecurity http) throws Exception {
@@ -36,20 +37,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests()
                     .antMatchers("/login").permitAll()
                     .antMatchers("/signup").permitAll()
-//                    .antMatchers("/css/login.css").permitAll()
-//                    .antMatchers("/css/signup.css").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .formLogin()
-                    .loginPage("/login")
-                    .defaultSuccessUrl("/")
-//                    .passwordParameter("password")
-//                    .usernameParameter("username")
-                    .failureUrl("/login")
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/myprofile", true)
+                        .failureUrl("/login?error=true")
+
                     .and()
-                    .logout()
-                    .logoutSuccessUrl("/login")
-                    .deleteCookies("JSESSIONID");
+                        .logout()
+                        .logoutSuccessUrl("/login")
+                        .deleteCookies("JSESSIONID");
         }
 
+        //lab17
+        @Override
+        @Bean
+        public AuthenticationManager authenticationManagerBean() throws Exception {
+            return super.authenticationManagerBean();
+        }
 }
