@@ -19,12 +19,34 @@
   /**/
   margin: 0;
 }
+img {
+  height: 100px;
+  width: 200px;
+}
 
 </style>
 <body>
-<div class="a">
-        <h1>Welcome to our website</h1>
-        <h1  th:text="${user.username}"></h1>
+<body>
+<div>
+    <h1 th:text="${user.firstName + ' ' + user.lastName}"></h1>
+    <p th:text="${'@' + user.username}"></p>
+    <img src="https://measuringu.com/wp-content/uploads/2018/03/The-User-Experience-of-Social-Media-Websites-1.jpg" alt="socila_media" />
+    <p th:text="${user.bio}"></p>
+
+    <form action="/post" method="POST">
+        <label>What's on your mind?</label><br><br>
+            <textarea name="body"></textarea><br>
+        <input type="submit" />
+    </form>
+
+    <h3>Posts</h3>
+    <ul>
+        <li th:each="post : ${posts}">
+            <p th:text="${post.createdAt}"></p>
+            <p th:text="${post.body}"></p>
+        </li>
+    </ul>
 </div>
+</body>
 </body>
 </html>
