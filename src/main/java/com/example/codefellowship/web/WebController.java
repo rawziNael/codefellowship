@@ -12,9 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.transaction.Transactional;
 import java.security.Principal;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -115,5 +117,29 @@ public class WebController{
         if (posts.size() > 0) {m.addAttribute("posts", posts);}
         m.addAttribute("user", applicationUserRepository.findById(userId).get());
         return "profile";
+    }
+
+    //***********************************************lab18****************************************************
+
+    //@Transactional
+    @PostMapping("/follow/{userId}")
+    public RedirectView followUser(@PathVariable long userId, Principal p, Model m) {
+        ApplicationUser currentUser = (ApplicationUser)((UsernamePasswordAuthenticationToken) p).getPrincipal();
+        currentUser.following.add(applicationUserRepository.findById(userId).get());
+        applicationUserRepository.save(currentUser);
+        return new RedirectView("/feed");
+    }
+
+    //@Transactional
+    @GetMapping("/feed")
+    public String showUsersFeed(Principal p, Model m) {
+        ApplicationUser currentUser = (ApplicationUser)((UsernamePasswordAuthenticationToken) p).getPrincipal();
+
+        List<Post> posts = new ArrayList<>();
+        for (ApplicationUser followed : currentUser.following) {
+            posts.addAll(followed.posts);
+        }
+        m.addAttribute("posts", posts);
+        return "feed";
     }
 }

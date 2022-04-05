@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>News Feed</title>
+</head>
+<body>
+<div>
+
+    <ul>
+        <li th:each="post : ${posts}">
+            <p th:text="${post.applicationUser.username + ' posted on ' + post.createdAt}"></p>
+            <p th:text="${post.body}"></p>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
