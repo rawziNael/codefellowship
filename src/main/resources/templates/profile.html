@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profile</title>
+</head>
+<style>
+    .a{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 100px;
+  place-items: stretch; /* this is the default value in most of the cases so it can be omitted */
+  grid-gap: 20px;
+
+  background-color: #eee;
+  /* center the content (you can also use flexbox or any common solution of centering) */
+  display: grid; /* OR inline-grid */
+  place-items: center;
+  /**/
+  margin: 0;
+}
+
+</style>
+<body>
+<div class="a">
+        <h1>Welcome to our website</h1>
+        <h1  th:text="${user.username}"></h1>
+</div>
+</body>
+</html>
