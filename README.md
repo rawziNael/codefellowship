@@ -10,3 +10,8 @@ The site have a page which allows viewing the data about a single ApplicationUse
 added Post entity to  application that has a body and a createdAt timestamp.  
 A logged-in user can be able to create a Post, and a post belong to the user that created it.  
 
+# Lab18:  
+add 2 new features:  
+1- /feed  
+2- /follow/{id}
+
