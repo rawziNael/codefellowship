@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head th:fragment="head">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Code Fellowship</title>
+    <link rel="stylesheet" th:href="@{/assets/css/normalize.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/background-style.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/main.css}">
+    <script th:src="@{/assets/js/main.js}" defer></script>
+
+</head>
+
+<body>
+
+  <nav th:fragment="nav" class="navbar">
+    <span class="navbarToggle" id="navbarToggle">
+      <i class="menuIcon"></i>
+    </span>
+    <a th:href="@{/}" class="logo">Code Fellowship</a>
+
+    <ul class="main" id="menu" th:if=${user}>
+      <li><a th:href="@{/}" class="menuLink">Home</a></li>
+      <li><a th:href="@{/myprofile}" th:text="${user.firstName}" class="menuLink"></a></li>
+      <li><a th:href="@{/feed}" class="menuLink">Feeds</a></li>
+      <li><a th:href="@{/logout}" class="menuLink">Log Out</a></li>
+    </ul>
+
+    <ul class="main" id="menu" th:unless=${user}>
+      <li><a th:href="@{/login}" class="menuLink">Log In</a></li>
+      <li><a th:href="@{/signup}" class="menuLink">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <div th:fragment="stars__box" class="stars__box">
+    <div id='stars'></div>
+    <div id='stars2'></div>
+    <div id='stars3'></div>
+  </div>
+
+
+  <section th:fragment="post" class="post">
+    <form class="post-form" th:action="'/post/' + ${user.id}" method="POST">
+      <h3>Create A New Post</h3>
+      <textarea name="body" th:placeholder="'What\'s on your mind, ' + ${user.firstName} + '?'" required></textarea>
+      <input type="submit" value="Post" />
+    </form>
+  </section>
+
+  <section th:fragment="posts" class="posts">
+    <p class="toptitle" th:text="${user.firstName} + '\'s Posts'">User's Posts</h3>
+    <section>
+      <div class="postinfo" th:each="post : ${user.posts}">
+        <div class="PostProfile">
+          <img class="" th:src="@{/assets/img/user.png}" />
+          <p th:text="${user.firstName}+' '+${user.lastName}"></p>
+        </div>
+        <h4 th:text="${post.createdAt}"></h4>
+        <p th:text="${post.body}"></p>
+      </div>
+    </section>
+  </section>
+
+  <section th:fragment="otheruserposts" class="posts">
+    <p class="toptitle" th:text="${otheruser.firstName} + '\'s Posts'">User's Posts</p>
+    <section>
+      <div class="postinfo" th:each="post : ${otheruser.posts}">
+        <div class="PostProfile">
+          <img class="" th:src="@{/assets/img/user.png}" />
+          <p th:text="${otheruser.firstName}+' '+${otheruser.lastName}"></p>
+        </div>
+        <h4 th:text="${post.createdAt}"></h4>
+        <p th:text="${post.body}"></p>
+      </div>
+    </section>
+  </section>
+
+</body>
+
+</html>
