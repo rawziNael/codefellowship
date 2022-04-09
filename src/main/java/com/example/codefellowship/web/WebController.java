@@ -6,6 +6,8 @@ import com.example.codefellowship.infrastructure.ApplicationUserRepository;
 import com.example.codefellowship.infrastructure.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -110,7 +112,15 @@ public class WebController{
         return "profile";
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/users")
+    String getAllUsers(Model model){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("username" , userDetails.getUsername());
+        model.addAttribute("users", applicationUserRepository.findAll());
+        return "users";
+    }
+
+    @GetMapping("/users/{userId}")
     public String viewProfile(@PathVariable long userId, Principal p, Model m) {
         //getUsername(p, m);
         List<Post> posts = applicationUserRepository.findById(userId).get().posts;
@@ -121,25 +131,31 @@ public class WebController{
 
     //***********************************************lab18****************************************************
 
-    //@Transactional
-    @PostMapping("/follow/{userId}")
-    public RedirectView followUser(@PathVariable long userId, Principal p, Model m) {
-        ApplicationUser currentUser = (ApplicationUser)((UsernamePasswordAuthenticationToken) p).getPrincipal();
-        currentUser.following.add(applicationUserRepository.findById(userId).get());
-        applicationUserRepository.save(currentUser);
-        return new RedirectView("/feed");
+    @GetMapping("/home")
+    public String myHomePage() {
+        return "home";
     }
 
-    //@Transactional
-    @GetMapping("/feed")
-    public String showUsersFeed(Principal p, Model m) {
-        ApplicationUser currentUser = (ApplicationUser)((UsernamePasswordAuthenticationToken) p).getPrincipal();
+    @Transactional
+    @GetMapping("/follow/{id}")
+    RedirectView showFollowSuccessScreen(@PathVariable("id") long id, Model model) {
 
-        List<Post> posts = new ArrayList<>();
-        for (ApplicationUser followed : currentUser.following) {
-            posts.addAll(followed.posts);
-        }
-        m.addAttribute("posts", posts);
+        ApplicationUser usertofollow = applicationUserRepository.findById(id).orElseThrow();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        ApplicationUser currentUser = applicationUserRepository.findByUsername(userDetails.getUsername());
+
+        currentUser.getFollowers().add(usertofollow);
+        usertofollow.getFollowing().add(currentUser);
+
+        applicationUserRepository.save(usertofollow);
+        applicationUserRepository.save(currentUser);
+
+        return new RedirectView("/home");
+    }
+
+    @GetMapping("/feed")
+    public String getFeed(Principal accountDetail, Model model) {
+        model.addAttribute("user", applicationUserRepository.findByUsername(accountDetail.getName()));
         return "feed";
     }
 }

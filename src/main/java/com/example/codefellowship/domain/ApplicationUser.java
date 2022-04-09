@@ -33,10 +33,10 @@ public class ApplicationUser implements UserDetails {
             joinColumns = {@JoinColumn(name = "follower_id")},
             inverseJoinColumns = {@JoinColumn(name = "followed_id")}
     )
-    public Set<ApplicationUser> following;
+    public List<ApplicationUser> following;
 
     @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY)
-    public Set<ApplicationUser> followers;
+    public List<ApplicationUser> followers;
 
     public void setFollowers(ApplicationUser user) {
         this.followers.add(user);
@@ -88,5 +88,14 @@ public class ApplicationUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    //hamzeh
+    public List<ApplicationUser> getFollowing() {
+        return following;
+    }
+
+    public List<ApplicationUser> getFollowers() {
+        return followers;
     }
 }
